@@ -35,5 +35,6 @@ def eligibility_chart(df):
         hole=0.5,
         template="plotly_dark"
     )
-
+    
+    fig.update_xaxes(tickangle=-35)
     return fig

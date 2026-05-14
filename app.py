@@ -25,7 +25,16 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+st.markdown("""
+<style>
 
+/* Remove fullscreen button only */
+button[title="View fullscreen"] {
+    visibility: hidden;
+}
+
+</style>
+""", unsafe_allow_html=True)
 # =========================================================
 # SESSION STATE
 # =========================================================
@@ -196,7 +205,7 @@ if st.button("🚀 Analyze Resumes"):
             )
 
             results.append({
-                "Resume": resume.name,
+                "Resume": resume.name[:30],
                 "Score": round(result["score"], 2),
                 "Skill Match %": f"{int(result['skill_match'])}%",
                 "Experience": result["experience"],

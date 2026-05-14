@@ -6,90 +6,238 @@ def load_css():
 
     <style>
 
-    #MainMenu {
-        visibility:hidden;
-    }
+    /* =========================================
+       GLOBAL
+    ========================================= */
 
     footer {
-        visibility:hidden;
+        visibility: hidden;
     }
 
-    header {
-        visibility:hidden;
+    html, body, [class*="css"] {
+        font-family: "Segoe UI", sans-serif;
+        transition: all 0.25s ease;
     }
 
-    .block-container {
-        padding-top:1rem;
-        padding-bottom:1rem;
-        max-width:1450px;
+    body {
+        background: #f1f5f9;
     }
+
+    /* =========================================
+       MAIN CONTENT RESPONSIVE
+    ========================================= */
+
+    .main .block-container {
+        max-width: 1600px;
+        margin: auto;
+        padding-top: 1rem;
+        padding-bottom: 2rem;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        transition: all 0.35s ease-in-out;
+    }
+
+    /* AUTO EXPAND CONTENT WHEN SIDEBAR COLLAPSES */
+
+    section[data-testid="stSidebar"][aria-expanded="false"] ~ div .main .block-container {
+        max-width: 1850px !important;
+        padding-left: 4rem !important;
+        padding-right: 4rem !important;
+    }
+
+    /* =========================================
+       SIDEBAR
+    ========================================= */
 
     section[data-testid="stSidebar"] {
-        background:#0f172a;
-    }
-                
-    section[data-testid="stSidebar"] * {
-        color:white;
+        background: linear-gradient(180deg,#020617,#071330);
+        width: 320px !important;
+        min-width: 320px !important;
+        border-right: 1px solid rgba(255,255,255,0.05);
     }
 
+    section[data-testid="stSidebar"] * {
+        color: white;
+    }
+
+    /* SIDEBAR COLLAPSE */
+
+    section[data-testid="stSidebar"][aria-expanded="false"] {
+        margin-left: -320px;
+    }
+
+    /* SIDEBAR TOGGLE BUTTON */
+
+    [data-testid="collapsedControl"] {
+        position: fixed;
+        top: 14px;
+        left: 14px;
+        z-index: 999999;
+        background: rgba(15,23,42,0.95);
+        border-radius: 12px;
+        padding: 6px;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.20);
+    }
+
+    /* =========================================
+       HERO SECTION
+    ========================================= */
+
     .hero-card {
-        background:linear-gradient(135deg,#020617,#172554);
-        padding:40px;
-        border-radius:24px;
-        color:white;
-        box-shadow:0 15px 35px rgba(0,0,0,0.25);
-        margin-bottom:20px;
+        background: linear-gradient(135deg,#020617,#172554);
+        padding: 42px;
+        border-radius: 30px;
+        color: white;
+        box-shadow: 0 20px 45px rgba(0,0,0,0.28);
+        margin-bottom: 28px;
     }
 
     .glass {
-        background:rgba(255,255,255,0.08);
-        backdrop-filter:blur(10px);
-        border:1px solid rgba(255,255,255,0.1);
-        border-radius:20px;
-        padding:18px;
+        background: rgba(255,255,255,0.08);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.10);
+        border-radius: 22px;
+        padding: 20px;
     }
+
+    /* =========================================
+       METRIC CARDS
+    ========================================= */
 
     .metric-card {
-        background:white;
-        padding:20px;
-        border-radius:18px;
-        box-shadow:0 6px 20px rgba(0,0,0,0.06);
-        text-align:center;
+        background: white;
+        padding: 24px;
+        border-radius: 20px;
+        box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+        text-align: center;
+        transition: 0.3s ease;
     }
 
+    .metric-card:hover {
+        transform: translateY(-4px);
+    }
+
+    /* =========================================
+       BADGES
+    ========================================= */
+
     .success-badge {
-        background:#dcfce7;
-        color:#166534;
-        padding:6px 14px;
-        border-radius:999px;
-        font-weight:700;
+        background: #dcfce7;
+        color: #166534;
+        padding: 8px 16px;
+        border-radius: 999px;
+        font-weight: 700;
+        margin-right: 8px;
+        display: inline-block;
     }
 
     .consider-badge {
-        background:#fef3c7;
-        color:#92400e;
-        padding:6px 14px;
-        border-radius:999px;
-        font-weight:700;
+        background: #fef3c7;
+        color: #92400e;
+        padding: 8px 16px;
+        border-radius: 999px;
+        font-weight: 700;
+        margin-right: 8px;
+        display: inline-block;
     }
 
     .reject-badge {
-        background:#fee2e2;
-        color:#991b1b;
-        padding:6px 14px;
-        border-radius:999px;
-        font-weight:700;
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 8px 16px;
+        border-radius: 999px;
+        font-weight: 700;
+        display: inline-block;
     }
 
+    /* =========================================
+       BUTTONS
+    ========================================= */
+
     .stButton button {
-        width:100%;
-        border:none;
-        border-radius:14px;
-        height:52px;
-        background:linear-gradient(135deg,#2563eb,#1d4ed8);
-        color:white;
-        font-size:17px;
-        font-weight:700;
+        width: 100%;
+        border: none;
+        border-radius: 14px;
+        height: 52px;
+        background: linear-gradient(135deg,#2563eb,#1d4ed8);
+        color: white;
+        font-size: 17px;
+        font-weight: 700;
+        transition: 0.3s ease;
+        box-shadow: 0 6px 18px rgba(37,99,235,0.25);
+    }
+
+    .stButton button:hover {
+        transform: translateY(-2px);
+        background: linear-gradient(135deg,#1d4ed8,#1e40af);
+    }
+
+    /* =========================================
+       INPUTS
+    ========================================= */
+
+    .stTextInput input,
+    .stNumberInput input,
+    .stTextArea textarea {
+        border-radius: 12px !important;
+    }
+
+    .stSelectbox div[data-baseweb="select"] {
+        border-radius: 12px !important;
+    }
+
+    /* =========================================
+       FILE UPLOADER
+    ========================================= */
+
+    [data-testid="stFileUploader"] {
+        border-radius: 20px;
+        border: 2px dashed #cbd5e1;
+        padding: 12px;
+        background: white;
+    }
+
+    /* =========================================
+       TABLES
+    ========================================= */
+
+    .stDataFrame {
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    /* =========================================
+       CHARTS
+    ========================================= */
+
+    .js-plotly-plot {
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    /* =========================================
+       REMOVE FULLSCREEN BUTTON
+    ========================================= */
+
+    button[title="View fullscreen"] {
+        visibility: hidden;
+    }
+
+    /* =========================================
+       SCROLLBAR
+    ========================================= */
+
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #94a3b8;
+        border-radius: 20px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #e2e8f0;
     }
 
     </style>

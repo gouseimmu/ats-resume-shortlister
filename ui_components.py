@@ -10,7 +10,7 @@ def hero_section():
 
     <div>
 
-    <h1 style="font-size:58px;margin:0;">
+   <h1 style="font-size:42px;margin:0;">
     🚀 TalentIQ ATS
     </h1>
 
@@ -34,7 +34,7 @@ def hero_section():
     Today's Hiring Activity
     </div>
 
-    <div style="font-size:52px;font-weight:800;color:#22c55e;">
+    <div style="font-size:36px;font-weight:800;color:#22c55e;">
     128
     </div>
 
@@ -54,14 +54,9 @@ def hero_section():
 
 def sidebar_panel():
 
-   
-
-  
-    st.image("assets/logo.png", width=170)
-
-        
-
     with st.sidebar:
+
+        st.image("assets/logo.png", width=170)
 
         st.title("⚡ ATS Dashboard")
 
