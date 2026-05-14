@@ -3,6 +3,21 @@ import streamlit as st
 def load_css():
     st.markdown("""
     <style>
+                
+                /* --- HIDE TOP TOOLBAR & MENU --- */
+    header[data-testid="stHeader"] {
+        visibility: hidden;
+        height: 0%;
+    }
+
+    /* --- HIDE BOTTOM "MANAGE APP" BUTTON --- */
+    footer {
+        visibility: hidden;
+    }
+    
+    [data-testid="stStatusWidget"] {
+        visibility: hidden;
+    }
     /* Ensure the sidebar is visible and toggleable */
     [data-testid="stSidebarNav"] {display: block !important;}
     
