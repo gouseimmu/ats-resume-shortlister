@@ -7,12 +7,42 @@ def load_css():
     <style>
 
     /* =========================================
-       GLOBAL
+       HIDE STREAMLIT DEFAULT UI
     ========================================= */
 
+    /* Hide top toolbar */
+    [data-testid="stToolbar"] {
+        display: none !important;
+    }
+
+    /* Hide top menu */
+    #MainMenu {
+        visibility: hidden;
+    }
+
+    /* Hide floating manage app button */
+    [data-testid="stStatusWidget"] {
+        display: none !important;
+    }
+
+    /* Hide fullscreen button */
+    button[title="View fullscreen"] {
+        display: none !important;
+    }
+
+    /* Hide header */
+    header[data-testid="stHeader"] {
+        display: none;
+    }
+
+    /* Hide footer */
     footer {
         visibility: hidden;
     }
+
+    /* =========================================
+       GLOBAL
+    ========================================= */
 
     html, body, [class*="css"] {
         font-family: "Segoe UI", sans-serif;
@@ -24,20 +54,20 @@ def load_css():
     }
 
     /* =========================================
-       MAIN CONTENT RESPONSIVE
+       MAIN CONTENT
     ========================================= */
 
     .main .block-container {
         max-width: 1600px;
         margin: auto;
-        padding-top: 1rem;
+        padding-top: 1rem !important;
         padding-bottom: 2rem;
         padding-left: 2rem;
         padding-right: 2rem;
         transition: all 0.35s ease-in-out;
     }
 
-    /* AUTO EXPAND CONTENT WHEN SIDEBAR COLLAPSES */
+    /* Auto responsive when sidebar collapsed */
 
     section[data-testid="stSidebar"][aria-expanded="false"] ~ div .main .block-container {
         max-width: 1850px !important;
@@ -60,13 +90,13 @@ def load_css():
         color: white;
     }
 
-    /* SIDEBAR COLLAPSE */
+    /* Sidebar collapsed */
 
     section[data-testid="stSidebar"][aria-expanded="false"] {
         margin-left: -320px;
     }
 
-    /* SIDEBAR TOGGLE BUTTON */
+    /* Sidebar toggle button */
 
     [data-testid="collapsedControl"] {
         position: fixed;
@@ -80,7 +110,7 @@ def load_css():
     }
 
     /* =========================================
-       HERO SECTION
+       HERO CARD
     ========================================= */
 
     .hero-card {
@@ -91,6 +121,10 @@ def load_css():
         box-shadow: 0 20px 45px rgba(0,0,0,0.28);
         margin-bottom: 28px;
     }
+
+    /* =========================================
+       GLASS EFFECT
+    ========================================= */
 
     .glass {
         background: rgba(255,255,255,0.08);
@@ -186,6 +220,10 @@ def load_css():
         border-radius: 12px !important;
     }
 
+    .stMultiSelect div[data-baseweb="select"] {
+        border-radius: 12px !important;
+    }
+
     /* =========================================
        FILE UPLOADER
     ========================================= */
@@ -198,7 +236,7 @@ def load_css():
     }
 
     /* =========================================
-       TABLES
+       DATAFRAMES
     ========================================= */
 
     .stDataFrame {
@@ -216,19 +254,12 @@ def load_css():
     }
 
     /* =========================================
-       REMOVE FULLSCREEN BUTTON
-    ========================================= */
-
-    button[title="View fullscreen"] {
-        visibility: hidden;
-    }
-
-    /* =========================================
        SCROLLBAR
     ========================================= */
 
     ::-webkit-scrollbar {
         width: 10px;
+        height: 10px;
     }
 
     ::-webkit-scrollbar-thumb {
@@ -238,6 +269,27 @@ def load_css():
 
     ::-webkit-scrollbar-track {
         background: #e2e8f0;
+    }
+
+    /* =========================================
+       ANIMATIONS
+    ========================================= */
+
+    .hero-card,
+    .metric-card,
+    [data-testid="stFileUploader"] {
+        animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0px);
+        }
     }
 
     </style>
