@@ -1,4 +1,6 @@
 streamlit
+pandas
+plotly
 pdfplumber
 python-docx
-pandas
+numpy
