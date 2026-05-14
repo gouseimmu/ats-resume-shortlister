@@ -51,7 +51,15 @@ def hero_section():
     """, unsafe_allow_html=True)
 
 
+
 def sidebar_panel():
+
+   
+
+  
+    st.image("assets/logo.png", width=170)
+
+        
 
     with st.sidebar:
 
