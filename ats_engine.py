@@ -2,69 +2,38 @@ from utils import clean_text, extract_experience
 
 
 def score_resume(resume_text, jd_text, skills, required_exp):
+    resume_clean = clean_text(resume_text)
+    jd_clean = clean_text(jd_text)
+    normalized_skills = [clean_text(skill).strip() for skill in skills if skill]
 
-    resume_text = clean_text(resume_text)
-    jd_text = clean_text(jd_text)
+    matched = [skill for skill in normalized_skills if skill and skill in resume_clean]
+    missing = [skill for skill in normalized_skills if skill and skill not in resume_clean]
 
-    matched = [
-        skill for skill in skills
-        if skill in resume_text
-    ]
+    skill_match_percent = round((len(matched) / len(normalized_skills)) * 100, 0) if normalized_skills else 0
+    skill_score = skill_match_percent * 0.55
 
-    missing = [
-        skill for skill in skills
-        if skill not in resume_text
-    ]
+    jd_words = set(word for word in jd_clean.split() if len(word) > 2)
+    resume_words = set(word for word in resume_clean.split() if len(word) > 2)
+    similarity = (len(jd_words & resume_words) / len(jd_words)) * 100 if jd_words else 0
+    similarity_score = similarity * 0.2
 
-    # Skill Score
-    skill_score = (
-        len(matched) / len(skills)
-    ) * 60 if skills else 0
-
-    # JD Similarity
-    jd_words = set(jd_text.split())
-    resume_words = set(resume_text.split())
-
-    similarity_score = (
-        len(jd_words & resume_words) / len(jd_words)
-    ) * 20 if jd_words else 0
-
-    # Experience
     resume_exp = extract_experience(resume_text)
-
-    if required_exp == 0:
+    required = required_exp[0] if isinstance(required_exp, (tuple, list)) else required_exp
+    if not required:
         exp_score = 20
     else:
-        exp_score = min(
-            (resume_exp / required_exp) * 20,
-            20
-        )
+        exp_score = min(resume_exp / required, 1) * 20
 
-    # Final Score
-    final_score = round(
-        skill_score + similarity_score + exp_score,
-        2
-    )
+    keyword_density = min(len(resume_words & set(normalized_skills)) * 2, 5)
+    final_score = round(min(skill_score + similarity_score + exp_score + keyword_density, 100), 2)
 
-    # Skill Match %
-    skill_match_percent = round(
-        (len(matched) / len(skills)) * 100,
-        0
-    ) if skills else 0
-
-    # Eligibility
-    if final_score >= 75 and resume_exp >= required_exp:
-
+    if final_score >= 75 and skill_match_percent >= 60 and resume_exp >= required:
         eligibility = "Eligible"
         recommendation = "Shortlist"
-
-    elif final_score >= 60:
-
+    elif final_score >= 55 or skill_match_percent >= 45:
         eligibility = "Consider"
-        recommendation = "Review"
-
+        recommendation = "Panel Review"
     else:
-
         eligibility = "Rejected"
         recommendation = "Reject"
 
@@ -75,5 +44,7 @@ def score_resume(resume_text, jd_text, skills, required_exp):
         "experience": resume_exp,
         "skill_match": skill_match_percent,
         "eligibility": eligibility,
-        "recommendation": recommendation
+        "recommendation": recommendation,
+        "similarity": round(similarity, 1),
     }
+

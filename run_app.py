@@ -6,16 +6,32 @@ import subprocess
 import webbrowser
 
 PORT = 8501
-LOCK_FILE = "browser_opened.lock"
+
+
+# ==========================================
+# CHECK IF STREAMLIT IS RUNNING
+# ==========================================
 
 def is_running():
+
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+
         return sock.connect_ex(("127.0.0.1", PORT)) == 0
 
+
+# ==========================================
+# PATHS
+# ==========================================
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 APP_PATH = os.path.join(BASE_DIR, "app.py")
 
-# Start Streamlit only once
+
+# ==========================================
+# START STREAMLIT
+# ==========================================
+
 if not is_running():
 
     streamlit_exe = os.path.join(
@@ -30,28 +46,39 @@ if not is_running():
             "run",
             APP_PATH,
             "--server.headless=true",
-            "--server.port=8501"
+            "--server.port=8501",
+            "--browser.gatherUsageStats=false"
         ],
+        cwd=BASE_DIR,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL
     )
 
-    # Wait for startup
+    # Wait for server startup
     for _ in range(30):
+
         if is_running():
             break
+
         time.sleep(1)
 
-# Open browser only ONCE
-lock_path = os.path.join(BASE_DIR, LOCK_FILE)
 
-if not os.path.exists(lock_path):
+# ==========================================
+# OPEN BROWSER
+# ==========================================
 
-    webbrowser.open("http://localhost:8501")
+webbrowser.open("http://localhost:8501")
 
-    with open(lock_path, "w") as f:
-        f.write("opened")
 
-# Keep alive
-while True:
-    time.sleep(1)
+# ==========================================
+# KEEP APP ACTIVE
+# ==========================================
+
+try:
+
+    while True:
+        time.sleep(1)
+
+except KeyboardInterrupt:
+
+    pass

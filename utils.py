@@ -5,7 +5,12 @@ import docx
 COMMON_SKILLS = [
     "power bi", "sql", "dax", "etl", "excel", "ssrs", "ssis", "ssas", 
     "python", "azure", "adf", "databricks", "pyspark", "synapse", 
-    "power query", "data modeling", "tableau", "qlik sense", "git"
+    "power query", "data modeling", "tableau", "qlik sense", "git",
+    "aws", "gcp", "snowflake", "airflow", "dbt", "spark", "hadoop",
+    "java", "javascript", "typescript", "react", "node.js", "django",
+    "flask", "fastapi", "docker", "kubernetes", "terraform", "linux",
+    "machine learning", "nlp", "statistics", "stakeholder management",
+    "agile", "scrum", "jira"
 ]
 
 def clean_text(text):
@@ -70,5 +75,22 @@ def extract_skills(text):
     cleaned_text = clean_text(text)
     return [
         skill for skill in COMMON_SKILLS
-        if skill in cleaned_text
+        if re.search(rf"\b{re.escape(skill)}\b", cleaned_text)
     ]
+def extract_contact_info(text):
+    """
+    Extracts email and phone number from raw resume text using regex.
+    """
+    # Email Regex: standard pattern for user@domain.com
+    email_pattern = r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'
+    
+    # Phone Regex: handles +1, (123), 123-456, and spaces
+    phone_pattern = r'(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}'
+    
+    email_match = re.search(email_pattern, text)
+    phone_match = re.search(phone_pattern, text)
+    
+    return {
+        "email": email_match.group(0) if email_match else "Not Found",
+        "phone": phone_match.group(0) if phone_match else "Not Found"
+    }
