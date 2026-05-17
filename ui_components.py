@@ -4,7 +4,7 @@ import os
 import streamlit as st
 
 
-APP_NAME = "Synapse ATS"
+APP_NAME = "JLL Talent Hub"
 APP_TAGLINE = "AI hiring intelligence for enterprise talent teams"
 HERO_TITLE = "Recruiting command center for faster, cleaner hiring decisions"
 HERO_SUBTITLE = "Parse JDs, rank candidates, schedule interviews, and monitor pipeline health from one polished workspace."
@@ -110,7 +110,7 @@ def render_insight_cards(df, interviews_count=0):
     rejected = len(df[df["Eligible"] == "Rejected"]) if total else 0
     avg_score = round(df["Score"].mean(), 1) if total else 0
 
-    cols = st.columns(5, gap="medium")
+    cols = st.columns(5, gap="large")
     with cols[0]:
         render_metric("Applicants", total, "parsed resumes", "#2563eb")
     with cols[1]:
@@ -240,49 +240,55 @@ def render_jd_summary(jd):
 
 
 def render_results_header():
-    cols = st.columns([0.55, 2.3, 0.9, 0.9, 1.05, 1.2, 1.1], gap="small")
-    labels = ["Rank", "Candidate", "Exp", "ATS", "Status", "Decision", "Action"]
-    for col, label in zip(cols, labels):
+    # Use EXACT same column proportions as candidate_row — ensures headers align with data
+    st.markdown('<div class="results-header-band">', unsafe_allow_html=True)
+    hcols = st.columns([0.5, 2.2, 0.75, 0.75, 1.0, 1.15, 1.1], gap="small")
+    for col, label in zip(hcols, ["Rank", "Candidate", "Exp", "ATS Score", "Status", "Decision", "Action"]):
         col.markdown(f'<div class="table-head">{label}</div>', unsafe_allow_html=True)
-
+    st.markdown('</div>', unsafe_allow_html=True)
 
 def candidate_row(row, rank):
     missing = row.get("Missing Skills", [])
     matched = row.get("Matched Skills", [])
-    with st.container(border=True):
-        cols = st.columns([0.55, 2.3, 0.9, 0.9, 1.05, 1.2, 1.1], gap="small")
-        cols[0].markdown(f'<span class="rank-badge">#{rank}</span>', unsafe_allow_html=True)
-        cols[1].markdown(
-            f"""
+    st.markdown('<div class="results-row">', unsafe_allow_html=True)
+    # Column proportions deliberately match the results-header-grid CSS columns:
+    # 52px / 2fr / 80px / 80px / 110px / 130px / 120px → approximated as ratios
+    cols = st.columns([0.5, 2.2, 0.75, 0.75, 1.0, 1.15, 1.1], gap="small")
+    cols[0].markdown(f'<span class="rank-badge">#{rank}</span>', unsafe_allow_html=True)
+    cols[1].markdown(
+        f"""
+        <div class="candidate-meta">
             <p class="candidate-name">{row['Candidate']}</p>
             <div class="candidate-email">{row['Email']}</div>
-            """,
-            unsafe_allow_html=True,
-        )
-        cols[2].write(f"{row['Experience']} yrs")
-        cols[3].markdown(f"**{row['Score']}%**")
-        cols[4].markdown(status_pill(row["Eligible"]), unsafe_allow_html=True)
-        cols[5].markdown(f"**{row['Recommendation']}**")
-        action = cols[6].button("Schedule", key=f"schedule_{rank}_{row['Email']}", type="primary", use_container_width=True)
-        menu = cols[6].selectbox("Actions", ["View", "Hold", "Reject"], key=f"action_{rank}_{row['Email']}", label_visibility="collapsed")
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    cols[2].markdown(f'<div class="table-cell">{row["Experience"]} yrs</div>', unsafe_allow_html=True)
+    cols[3].markdown(f'<div class="table-cell"><strong>{row["Score"]}%</strong></div>', unsafe_allow_html=True)
+    cols[4].markdown(status_pill(row["Eligible"]), unsafe_allow_html=True)
+    cols[5].markdown(f'<div class="table-cell"><strong>{row["Recommendation"]}</strong></div>', unsafe_allow_html=True)
+    action = cols[6].button("Schedule", key=f"schedule_{rank}_{row['Email']}", type="primary", use_container_width=True)
+    menu = cols[6].selectbox("Actions", ["View", "Hold", "Reject"], key=f"action_{rank}_{row['Email']}", label_visibility="collapsed")
 
-        skill_cols = st.columns([1, 1], gap="large")
-        with skill_cols[0]:
-            st.markdown('<p class="skill-label">Matched Skills</p>', unsafe_allow_html=True)
-            render_skill_tags(matched, limit=6)
-        with skill_cols[1]:
-            st.markdown('<p class="skill-label">Missing Skills</p>', unsafe_allow_html=True)
-            render_skill_tags(missing, limit=6)
+    skill_cols = st.columns([1, 1], gap="large")
+    with skill_cols[0]:
+        st.markdown('<p class="skill-label">Matched Skills</p>', unsafe_allow_html=True)
+        render_skill_tags(matched, limit=6)
+    with skill_cols[1]:
+        st.markdown('<p class="skill-label">Missing Skills</p>', unsafe_allow_html=True)
+        render_skill_tags(missing, limit=6)
 
-        with st.expander(f"Candidate details - {row['Candidate']}", expanded=False):
-            d1, d2 = st.columns(2, gap="large")
-            with d1:
-                st.caption("Matched skills")
-                render_skill_tags(matched, limit=20)
-            with d2:
-                st.caption("Missing skills")
-                render_skill_tags(missing, limit=20)
-            st.write(f"{row.get('Summary', 'No summary available.')} Decision: {row['Recommendation']}.")
+    with st.expander(f"Candidate details - {row['Candidate']}", expanded=False):
+        d1, d2 = st.columns(2, gap="large")
+        with d1:
+            st.caption("Matched skills")
+            render_skill_tags(matched, limit=20)
+        with d2:
+            st.caption("Missing skills")
+            render_skill_tags(missing, limit=20)
+        st.write(f"{row.get('Summary', 'No summary available.')} Decision: {row['Recommendation']}.")
+    st.markdown('</div>', unsafe_allow_html=True)
     return action, menu
 
 

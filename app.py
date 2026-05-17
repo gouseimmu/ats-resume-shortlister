@@ -48,7 +48,7 @@ validate_email_payload = scheduler_module.validate_email_payload
 
 st.set_page_config(
     page_title=f"{APP_NAME} | Enterprise Recruitment",
-    page_icon="🏢",
+    page_icon="assets/logo.png",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -72,9 +72,40 @@ init_state()
 inject_styles(st.session_state.sidebar_collapsed)
 init_db()
 
+# Runtime JS: forcibly remove Streamlit's floating sidebar expand/collapse button
+# CSS alone can be overridden by Streamlit's React re-renders; MutationObserver is persistent
+st.markdown(
+    """
+    <script>
+    (function() {
+        function killSidebarArrow() {
+            const selectors = [
+                '[data-testid="stExpandSidebarButton"]',
+                '[data-testid="stSidebarCollapseButton"]',
+                '[data-testid="collapsedControl"]',
+            ];
+            selectors.forEach(sel => {
+                document.querySelectorAll(sel).forEach(el => {
+                    el.style.cssText = 'display:none!important;width:0!important;height:0!important;opacity:0!important;pointer-events:none!important;position:absolute!important;left:-9999px!important;';
+                });
+            });
+        }
+        // Run immediately and on every DOM mutation
+        killSidebarArrow();
+        const observer = new MutationObserver(killSidebarArrow);
+        observer.observe(document.body, { childList: true, subtree: true });
+    })();
+    </script>
+    """,
+    unsafe_allow_html=True,
+)
+
 
 def render_navbar():
-    st.markdown('<div class="nav-shell">', unsafe_allow_html=True)
+    # Streamlit isolates HTML div wrappers into empty React nodes.
+    # Instead: inject a unique marker BEFORE the columns, then CSS targets
+    # [data-testid="stVerticalBlock"]:has(.navbar-marker) > div [data-testid="stHorizontalBlock"]
+    st.markdown('<div class="navbar-marker" style="display:none;height:0;"></div>', unsafe_allow_html=True)
     c1, c2, c3 = st.columns([0.14, 1.15, 1.5], gap="small")
     with c1:
         if st.button("☰", key="sidebar_toggle", help="Show or hide sidebar", use_container_width=True):
@@ -98,7 +129,6 @@ def render_navbar():
             label_visibility="collapsed",
             key="top_nav",
         )
-    st.markdown("</div>", unsafe_allow_html=True)
     return nav_value
 
 

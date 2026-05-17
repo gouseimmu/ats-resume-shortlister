@@ -73,23 +73,65 @@ def inject_styles(sidebar_collapsed=False):
             display: none !important;
         }
 
+        /* ===== STREAMLIT 1.57 EXACT SIDEBAR TOGGLE KILL ===== */
+        [data-testid="stExpandSidebarButton"],
+        [data-testid="stSidebarCollapseButton"],
+        [data-testid="stSidebarCollapseButton"] *,
         [data-testid="collapsedControl"],
-        [data-testid="collapsedControl"] button,
+        [data-testid="collapsedControl"] *,
         button[title="Close sidebar"],
-        button[title="Open sidebar"] {
+        button[title="Open sidebar"],
+        button[kind="headerNoPadding"],
+        button[kind="header"] {
             display: none !important;
             visibility: hidden !important;
+            width: 0 !important;
+            height: 0 !important;
+            min-width: 0 !important;
+            min-height: 0 !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            position: absolute !important;
+            left: -9999px !important;
+            top: -9999px !important;
+            overflow: hidden !important;
+        }
+
+        /* ===== KILL EMPTY NAV-SHELL DIV (Streamlit isolates HTML divs) ===== */
+        /* The actual navbar uses st.columns which creates stHorizontalBlock */
+        /* The empty .nav-shell div renders as an unwanted white capsule at top */
+        .nav-shell:not(:has(*)) {
+            display: none !important;
+            height: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        /* ===== ZERO OUT ALL STREAMLIT MAIN PADDING ===== */
+        .main {
+            padding-top: 0 !important;
+        }
+        [data-testid="stMain"] {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
+        [data-testid="stAppViewBlockContainer"] {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
         }
 
         div.block-container {
             max-width: 1360px;
-            padding: 0.9rem 1.25rem 1.4rem;
+            padding: 0 1.25rem 1.4rem;
             margin-top: 0 !important;
         }
 
-        [data-testid="stVerticalBlock"] { gap: 0.6rem; }
-        [data-testid="stHorizontalBlock"] { gap: 0.9rem; }
-        .stDivider, hr { margin: 0.7rem 0 !important; border-color: var(--border) !important; }
+        /* Tight vertical rhythm — 8px system */
+        [data-testid="stVerticalBlock"] { gap: 0.5rem; }
+        [data-testid="stHorizontalBlock"] { gap: 0.75rem !important; align-items: stretch !important; }
+        .stDivider, hr { margin: 0.75rem 0 !important; border-color: var(--border) !important; }
 
         h1, h2, h3 {
             letter-spacing: 0;
@@ -134,42 +176,46 @@ def inject_styles(sidebar_collapsed=False):
         .sidebar-shell {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.85rem;
         }
 
         .sidebar-brand {
-            display: grid;
-            place-items: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
-            padding: 1.35rem 1rem 1.15rem;
-            border-radius: 24px;
-            background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08));
-            border: 1px solid rgba(255,255,255,0.18);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), 0 18px 36px rgba(0,0,0,0.08);
-            min-height: 190px;
+            padding: 1.5rem 1rem 1.2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            margin-bottom: 0.25rem;
         }
 
         .sidebar-logo {
-            width: 106px;
-            height: 106px;
-            display: grid;
-            place-items: center;
-            border-radius: 24px;
-            background: rgba(255,255,255,0.18);
-            box-shadow: 0 24px 54px rgba(15,23,42,0.12);
-            overflow: hidden;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1rem;
         }
 
-        .sidebar-logo img,
-        .sidebar-logo-fallback {
-            width: auto;
-            height: 72%;
+        .sidebar-logo img {
+            width: 148px;
+            max-width: 100%;
+            height: auto;
             object-fit: contain;
-            display: grid;
-            place-items: center;
+            mix-blend-mode: screen;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+        }
+
+        .sidebar-logo-fallback {
+            width: 130px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: #ffffff;
             font-weight: 900;
-            letter-spacing: 0.08em;
+            font-size: 2rem;
+            letter-spacing: 0.05em;
         }
 
         .sidebar-brand-copy {
@@ -330,7 +376,8 @@ def inject_styles(sidebar_collapsed=False):
             grid-template-columns: minmax(0, 1fr) auto;
             align-items: center;
             gap: 1rem;
-            padding: 1rem 1.1rem;
+            padding: 0.85rem 1.1rem;
+            margin-bottom: 0.25rem;
             border: 1px solid rgba(37, 99, 235, 0.16);
             border-radius: 14px;
             background:
@@ -339,21 +386,31 @@ def inject_styles(sidebar_collapsed=False):
             box-shadow: var(--shadow);
         }
 
+        /* ===== NAVBAR — Precision targeting via .navbar-marker sibling ===== */
+        /* A hidden .navbar-marker div is injected just before the navbar st.columns. */
+        /* This lets us style the exact stVerticalBlock containing the navbar columns. */
         .nav-shell {
+            display: none; /* empty nav-shell div is hidden */
+        }
+
+        /* Target the stVerticalBlock that contains .navbar-marker */
+        [data-testid="stVerticalBlock"]:has(> div > [data-testid="stVerticalBlock"] .navbar-marker) > div:has(.navbar-marker) ~ div [data-testid="stHorizontalBlock"],
+        /* Fallback: target the stHorizontalBlock immediately after the navbar-marker stMarkdownContainer */
+        [data-testid="stMarkdownContainer"]:has(.navbar-marker) ~ [data-testid="stHorizontalBlock"],
+        div:has(> [data-testid="stMarkdownContainer"] .navbar-marker) + div [data-testid="stHorizontalBlock"] {
             position: sticky;
             top: 0;
             z-index: 999;
-            display: grid;
-            grid-template-columns: 0.11fr 0.85fr 1.2fr;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.8rem 1rem;
-            margin: 0 0 1.1rem;
-            border: 1px solid rgba(203, 213, 225, 0.55);
-            border-radius: 24px;
-            background: rgba(255, 255, 255, 0.92);
-            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
-            backdrop-filter: blur(18px);
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(24px) !important;
+            -webkit-backdrop-filter: blur(24px) !important;
+            border: 1px solid rgba(203, 213, 225, 0.5) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.07), 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+            padding: 0.65rem 1rem !important;
+            margin-bottom: 0.75rem !important;
+            align-items: center !important;
+            gap: 0.75rem !important;
         }
 
         .topbar-brand {
@@ -499,20 +556,30 @@ def inject_styles(sidebar_collapsed=False):
             padding: 0.38rem 0.62rem;
         }
 
-        .metric-card, .panel-card, .candidate-card, div[data-testid="stVerticalBlockBorderWrapper"] {
-            background: rgba(255,255,255,0.94);
-            border: 1px solid var(--border) !important;
-            border-radius: 18px !important;
-            box-shadow: var(--shadow);
+        /* ===== METRIC CARDS ===== */
+        .metric-card, .panel-card, .candidate-card {
+            background: #ffffff;
+            border: 1px solid #e8eef7 !important;
+            border-radius: 16px !important;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.04) !important;
+        }
+
+        /* Metric row: each Streamlit column stretches equally */
+        [data-testid="stHorizontalBlock"] > div:has(.metric-card) {
+            flex: 1 1 0 !important;
+            min-width: 0 !important;
         }
 
         .metric-card {
-            min-height: 118px;
-            padding: 1rem 1rem;
-            border-left: 6px solid transparent;
+            min-height: 112px;
+            padding: 1rem 1.2rem;
+            border-left: 4px solid transparent !important;
             position: relative;
             overflow: hidden;
-            transition: transform 0.18s ease, box-shadow 0.18s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .metric-card::before {
@@ -520,13 +587,12 @@ def inject_styles(sidebar_collapsed=False):
             position: absolute;
             inset: 0;
             z-index: 0;
-            background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.08), transparent 28%);
-            opacity: 0.85;
+            background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.05), transparent 60%);
         }
 
         .metric-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 20px 52px rgba(15, 23, 42, 0.12);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1), 0 20px 48px rgba(15, 23, 42, 0.06) !important;
         }
 
         .metric-card .metric-label,
@@ -536,14 +602,39 @@ def inject_styles(sidebar_collapsed=False):
             z-index: 1;
         }
 
-        .metric-card:nth-child(1) { border-left-color: #2563eb; }
-        .metric-card:nth-child(2) { border-left-color: #16a34a; }
-        .metric-card:nth-child(3) { border-left-color: #f59e0b; }
-        .metric-card:nth-child(4) { border-left-color: #4f46e5; }
+        .metric-card:nth-child(1) { border-left-color: #2563eb !important; }
+        .metric-card:nth-child(2) { border-left-color: #16a34a !important; }
+        .metric-card:nth-child(3) { border-left-color: #f59e0b !important; }
+        .metric-card:nth-child(4) { border-left-color: #dc2626 !important; }
+        .metric-card:nth-child(5) { border-left-color: #4f46e5 !important; }
+
+        .metric-label {
+            color: var(--muted);
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        .metric-value {
+            color: var(--ink);
+            font-size: 1.95rem;
+            font-weight: 800;
+            margin: 0.35rem 0 0.15rem;
+            line-height: 1.1;
+        }
+
+        .metric-note {
+            color: var(--muted);
+            font-size: 0.8rem;
+            margin: 0;
+            font-weight: 500;
+        }
 
         .metric-card .metric-note {
-            margin-top: 0.5rem;
-            color: #64748b;
+            margin-top: 0;
+            color: #94a3b8;
         }
 
         .jd-intel-shell {
@@ -727,39 +818,6 @@ def inject_styles(sidebar_collapsed=False):
             overflow: visible;
         }
 
-        .metric-card {
-            min-height: 102px;
-            padding: 0.9rem 0.95rem;
-            transition: transform 0.18s ease, box-shadow 0.18s ease;
-        }
-
-        .metric-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 20px 48px rgba(15, 23, 42, 0.12);
-        }
-
-        .metric-label {
-            color: var(--muted);
-            font-size: 0.72rem;
-            font-weight: 800;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            margin: 0;
-        }
-
-        .metric-value {
-            color: var(--ink);
-            font-size: 1.85rem;
-            font-weight: 800;
-            margin: 0.42rem 0 0.1rem;
-            line-height: 1;
-        }
-
-        .metric-note {
-            color: var(--muted);
-            font-size: 0.76rem;
-            margin: 0;
-        }
 
         .status-pill {
             display: inline-flex;
@@ -778,12 +836,37 @@ def inject_styles(sidebar_collapsed=False):
 
         .results-shell {
             border: 1px solid var(--border);
-            border-radius: 14px;
-            background: rgba(255,255,255,0.72);
+            border-radius: 16px;
+            background: #ffffff;
             box-shadow: var(--shadow);
-            padding: 0.55rem;
-            overflow-x: hidden;
+            padding: 0;
+            overflow: hidden;
         }
+
+        /* Header band — uses st.columns so it auto-aligns with data rows */
+        .results-header-band {
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+            padding: 0 0.35rem;
+        }
+
+        /* Ensure header band stHorizontalBlock matches row stHorizontalBlock */
+        .results-header-band [data-testid="stHorizontalBlock"],
+        .results-row [data-testid="stHorizontalBlock"] {
+            align-items: center !important;
+            gap: 0.5rem !important;
+            padding: 0 !important;
+        }
+
+        /* ATS row wrapper */
+        .results-row {
+            border-bottom: 1px solid #f1f5f9;
+            padding: 0.5rem 0.35rem 0.35rem;
+            transition: background 0.15s ease;
+        }
+
+        .results-row:last-child { border-bottom: none; }
+        .results-row:hover { background: #fafbff; }
 
         .candidate-card .stColumn {
             display: flex;
@@ -904,20 +987,13 @@ def inject_styles(sidebar_collapsed=False):
             text-decoration: underline;
         }
 
-        div[data-testid="stVerticalBlockBorderWrapper"]:has(.candidate-name) {
-            background: rgba(255,255,255,0.94);
-            border: 1px solid var(--border) !important;
-            border-radius: 14px !important;
-            box-shadow: var(--shadow);
-            padding: 0.35rem 0.55rem 0.55rem;
-            margin-bottom: 0.7rem;
-            transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
-        }
-
-        div[data-testid="stVerticalBlockBorderWrapper"]:has(.candidate-name):hover {
-            transform: translateY(-1px);
-            border-color: #bfdbfe !important;
-            box-shadow: 0 18px 42px rgba(37, 99, 235, 0.1);
+        .results-row div[data-testid="stVerticalBlockBorderWrapper"] {
+            background: transparent !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
         }
 
         .rank-badge {
@@ -967,16 +1043,28 @@ def inject_styles(sidebar_collapsed=False):
         }
 
         .table-head {
-            background: #eef4ff;
-            border: 1px solid #d4e2ff;
-            border-radius: 10px;
-            padding: 0.62rem 0.72rem;
             color: #344054;
             font-size: 0.68rem;
             font-weight: 800;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
             white-space: nowrap;
+            padding: 0.75rem 0.6rem;
+        }
+
+        .table-cell {
+            color: #1e293b;
+            font-size: 0.88rem;
+            font-weight: 600;
+            padding: 0.25rem 0;
+            display: flex;
+            align-items: center;
+            min-height: 100%;
+        }
+
+        .table-cell strong {
+            color: #0f172a;
+            font-weight: 700;
         }
 
         .skill-tag {
