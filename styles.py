@@ -57,9 +57,20 @@ def inject_styles(sidebar_collapsed=False):
         [data-testid="stDecoration"],
         [data-testid="stStatusWidget"],
         #MainMenu,
-        footer {
+        footer,
+        .viewerBadge,
+        [data-testid="stViewerBadge"],
+        .stAppDeployButton,
+        [data-testid="viewerBadge"],
+        #connection-status,
+        [data-testid="stConnectionStatus"],
+        .stConnectionStatus {
             visibility: hidden !important;
+            display: none !important;
             height: 0 !important;
+            width: 0 !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
         }
 
         header[data-testid="stHeader"] {

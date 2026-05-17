@@ -72,28 +72,78 @@ init_state()
 inject_styles(st.session_state.sidebar_collapsed)
 init_db()
 
-# Runtime JS: forcibly remove Streamlit's floating sidebar expand/collapse button
-# CSS alone can be overridden by Streamlit's React re-renders; MutationObserver is persistent
+# Runtime JS: Eliminate all Streamlit branding, force custom tab title/favicon, and hide developer widgets
 st.markdown(
     """
     <script>
     (function() {
-        function killSidebarArrow() {
+        // 1. Force custom tab title without 'Streamlit' prefix
+        function enforceTitle() {
+            const targetTitle = "JLL Talent Hub | Enterprise Recruitment";
+            if (document.title !== targetTitle) {
+                document.title = targetTitle;
+            }
+        }
+        
+        // 2. Force high-quality custom JLL Red SVG Favicon
+        function enforceFavicon() {
+            let links = document.querySelectorAll("link[rel*='icon']");
+            links.forEach(el => el.remove());
+            
+            const link = document.createElement('link');
+            link.type = 'image/svg+xml';
+            link.rel = 'icon';
+            // Custom clean enterprise JLL Red styled SVG
+            link.href = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2224%22 fill=%22%23dc2626%22/><text y=%22.95em%22 x=%22.1em%22 font-size=%2265%22 fill=%22white%22 font-family=%22Inter, sans-serif%22 font-weight=%22800%22>J</text></svg>';
+            document.getElementsByTagName('head')[0].appendChild(link);
+        }
+
+        // 3. Forcibly nuke all default Streamlit branding, deployment, viewer badges, and floating controls
+        function killStreamlitBranding() {
+            // Sidebar buttons, developer viewer badge, deploy button, status indicator, toolbar
             const selectors = [
                 '[data-testid="stExpandSidebarButton"]',
                 '[data-testid="stSidebarCollapseButton"]',
                 '[data-testid="collapsedControl"]',
+                '.viewerBadge',
+                '[data-testid="stViewerBadge"]',
+                '.stAppDeployButton',
+                '[data-testid="viewerBadge"]',
+                '#connection-status',
+                '[data-testid="stConnectionStatus"]',
+                '.stConnectionStatus',
+                '[data-testid="stToolbar"]',
+                '[data-testid="stDecoration"]',
+                '[data-testid="stStatusWidget"]',
+                'footer',
+                '#MainMenu'
             ];
             selectors.forEach(sel => {
                 document.querySelectorAll(sel).forEach(el => {
-                    el.style.cssText = 'display:none!important;width:0!important;height:0!important;opacity:0!important;pointer-events:none!important;position:absolute!important;left:-9999px!important;';
+                    el.style.cssText = 'display:none!important;visibility:hidden!important;opacity:0!important;width:0!important;height:0!important;pointer-events:none!important;position:absolute!important;left:-9999px!important;top:-9999px!important;overflow:hidden!important;';
                 });
             });
         }
-        // Run immediately and on every DOM mutation
-        killSidebarArrow();
-        const observer = new MutationObserver(killSidebarArrow);
+
+        // Run immediately
+        enforceTitle();
+        enforceFavicon();
+        killStreamlitBranding();
+
+        // Run on every single DOM mutation to ensure React re-renders do not revert these changes
+        const observer = new MutationObserver(() => {
+            enforceTitle();
+            enforceFavicon();
+            killStreamlitBranding();
+        });
         observer.observe(document.body, { childList: true, subtree: true });
+        
+        // Also observe the document title element specifically
+        const titleEl = document.querySelector('title');
+        if (titleEl) {
+            const titleObserver = new MutationObserver(enforceTitle);
+            titleObserver.observe(titleEl, { childList: true, characterData: true });
+        }
     })();
     </script>
     """,
