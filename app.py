@@ -1,8 +1,11 @@
+import base64
 from datetime import date, datetime
 import importlib
+import os
 
 import pandas as pd
 import streamlit as st
+
 
 from ats_engine import score_resume
 from charts import (
@@ -48,7 +51,7 @@ validate_email_payload = scheduler_module.validate_email_payload
 
 st.set_page_config(
     page_title=f"{APP_NAME} | Enterprise Recruitment",
-    page_icon="assets/logo.png",
+    page_icon="assets/coforge-logo.jpg",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -72,29 +75,33 @@ init_state()
 inject_styles(st.session_state.sidebar_collapsed)
 init_db()
 
+logo_path = os.path.join("assets", "logo.png")
+logo_base64 = ""
+if os.path.exists(logo_path):
+    with open(logo_path, "rb") as image_file:
+        logo_base64 = base64.b64encode(image_file.read()).decode("utf-8")
+
 # Runtime JS: Eliminate all Streamlit branding, force custom tab title/favicon, and hide developer widgets
-st.markdown(
-    """
+script_template = """
     <script>
     (function() {
         // 1. Force custom tab title without 'Streamlit' prefix
         function enforceTitle() {
-            const targetTitle = "JLL Talent Hub | Enterprise Recruitment";
+            const targetTitle = "Coforge Talent Hub | Enterprise Recruitment";
             if (document.title !== targetTitle) {
                 document.title = targetTitle;
             }
         }
-        
-        // 2. Force high-quality custom JLL Red SVG Favicon
+
+        // 2. Force high-quality custom base64-encoded Favicon
         function enforceFavicon() {
             let links = document.querySelectorAll("link[rel*='icon']");
             links.forEach(el => el.remove());
-            
+
             const link = document.createElement('link');
-            link.type = 'image/svg+xml';
+            link.type = 'image/jpeg';
             link.rel = 'icon';
-            // Custom clean enterprise JLL Red styled SVG
-            link.href = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2224%22 fill=%22%23dc2626%22/><text y=%22.95em%22 x=%22.1em%22 font-size=%2265%22 fill=%22white%22 font-family=%22Inter, sans-serif%22 font-weight=%22800%22>J</text></svg>';
+            link.href = 'data:image/jpeg;base64,{logo_base64}';
             document.getElementsByTagName('head')[0].appendChild(link);
         }
 
@@ -137,7 +144,7 @@ st.markdown(
             killStreamlitBranding();
         });
         observer.observe(document.body, { childList: true, subtree: true });
-        
+
         // Also observe the document title element specifically
         const titleEl = document.querySelector('title');
         if (titleEl) {
@@ -146,9 +153,8 @@ st.markdown(
         }
     })();
     </script>
-    """,
-    unsafe_allow_html=True,
-)
+"""
+st.markdown(script_template.replace("{logo_base64}", logo_base64), unsafe_allow_html=True)
 
 
 def render_navbar():

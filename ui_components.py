@@ -4,7 +4,7 @@ import os
 import streamlit as st
 
 
-APP_NAME = "JLL Talent Hub"
+APP_NAME = "Coforge Talent Hub"
 APP_TAGLINE = "AI hiring intelligence for enterprise talent teams"
 HERO_TITLE = "Recruiting command center for faster, cleaner hiring decisions"
 HERO_SUBTITLE = "Parse JDs, rank candidates, schedule interviews, and monitor pipeline health from one polished workspace."
@@ -31,11 +31,11 @@ def status_pill(status):
 
 def sidebar_panel():
     with st.sidebar:
-        logo_path = os.path.join("assets", "logo.png")
+        logo_path = os.path.join("assets", "coforge-logo.jpg")
         if os.path.exists(logo_path):
-            logo_html = f'<img src="data:image/png;base64,{_image_as_base64(logo_path)}" alt="JLL logo" />'
+            logo_html = f'<img src="data:image/jpeg;base64,{_image_as_base64(logo_path)}" alt="Coforge logo" />'
         else:
-            logo_html = '<div class="sidebar-logo-fallback">JLL</div>'
+            logo_html = '<div class="sidebar-logo-fallback">Coforge</div>'
 
         st.markdown(
             f"""
@@ -43,7 +43,7 @@ def sidebar_panel():
                 <div class="sidebar-brand">
                     <div class="sidebar-logo">{logo_html}</div>
                     <div class="sidebar-brand-copy">
-                        <p class="sidebar-brand-title">JLL Talent Hub</p>
+                        <p class="sidebar-brand-title">Coforge Talent Hub</p>
                         <p class="sidebar-brand-subtitle">AI-driven enterprise recruitment command center</p>
                     </div>
                 </div>
@@ -268,26 +268,37 @@ def candidate_row(row, rank):
     cols[3].markdown(f'<div class="table-cell"><strong>{row["Score"]}%</strong></div>', unsafe_allow_html=True)
     cols[4].markdown(status_pill(row["Eligible"]), unsafe_allow_html=True)
     cols[5].markdown(f'<div class="table-cell"><strong>{row["Recommendation"]}</strong></div>', unsafe_allow_html=True)
-    action = cols[6].button("Schedule", key=f"schedule_{rank}_{row['Email']}", type="primary", use_container_width=True)
-    menu = cols[6].selectbox("Actions", ["View", "Hold", "Reject"], key=f"action_{rank}_{row['Email']}", label_visibility="collapsed")
+    with cols[6]:
+        st.markdown('<div class="action-stack">', unsafe_allow_html=True)
+        action = st.button("Schedule", key=f"schedule_{rank}_{row['Email']}", type="primary", use_container_width=True)
+        menu = st.selectbox("Actions", ["View", "Hold", "Reject"], key=f"action_{rank}_{row['Email']}", label_visibility="collapsed")
+        st.markdown('</div>', unsafe_allow_html=True)
 
+    st.markdown('<div class="candidate-skill-grid">', unsafe_allow_html=True)
     skill_cols = st.columns([1, 1], gap="large")
     with skill_cols[0]:
-        st.markdown('<p class="skill-label">Matched Skills</p>', unsafe_allow_html=True)
+        st.markdown('<div class="skill-panel"><p class="skill-label">Matched Skills</p>', unsafe_allow_html=True)
         render_skill_tags(matched, limit=6)
+        st.markdown('</div>', unsafe_allow_html=True)
     with skill_cols[1]:
-        st.markdown('<p class="skill-label">Missing Skills</p>', unsafe_allow_html=True)
+        st.markdown('<div class="skill-panel"><p class="skill-label">Missing Skills</p>', unsafe_allow_html=True)
         render_skill_tags(missing, limit=6)
+        st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
     with st.expander(f"Candidate details - {row['Candidate']}", expanded=False):
+        st.markdown('<div class="candidate-skill-grid expander-skill-grid">', unsafe_allow_html=True)
         d1, d2 = st.columns(2, gap="large")
         with d1:
-            st.caption("Matched skills")
+            st.markdown('<div class="skill-panel"><p class="skill-label">Matched Skills</p>', unsafe_allow_html=True)
             render_skill_tags(matched, limit=20)
+            st.markdown('</div>', unsafe_allow_html=True)
         with d2:
-            st.caption("Missing skills")
+            st.markdown('<div class="skill-panel"><p class="skill-label">Missing Skills</p>', unsafe_allow_html=True)
             render_skill_tags(missing, limit=20)
-        st.write(f"{row.get('Summary', 'No summary available.')} Decision: {row['Recommendation']}.")
+            st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="candidate-summary">{row.get("Summary", "No summary available.")} Decision: {row["Recommendation"]}.</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
     return action, menu
 

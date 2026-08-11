@@ -19,9 +19,10 @@ def apply_enterprise_layout(fig, height=340):
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(family="Inter, sans-serif", size=12, color="#1f2937"),
-        margin=dict(t=42, b=28, l=34, r=24),
+        margin=dict(t=54, b=34, l=34, r=24),
         hoverlabel=dict(bgcolor="#111827", font_color="#ffffff", bordercolor="#111827"),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        title_x=0.05,
     )
     fig.update_xaxes(showgrid=False, zeroline=False, linecolor="#e5e7eb")
     fig.update_yaxes(gridcolor="#eef2f7", zeroline=False, linecolor="#e5e7eb")
@@ -32,16 +33,17 @@ def score_chart(df):
     data = df.sort_values("Score", ascending=False).head(12)
     fig = px.bar(
         data,
-        x="Candidate",
-        y="Score",
+        x="Score",
+        y="Candidate",
+        orientation="h",
         color="Eligible",
         text="Score",
         color_discrete_map=STATUS_COLORS,
         title="ATS Score Distribution",
     )
     fig.update_traces(texttemplate="%{text:.0f}", textposition="outside", marker_line_width=0)
-    fig.update_yaxes(range=[0, 105], title="")
-    fig.update_xaxes(title="", tickangle=-20)
+    fig.update_xaxes(range=[0, 105], title="Score")
+    fig.update_yaxes(title="", autorange="reversed")
     return apply_enterprise_layout(fig, 360)
 
 

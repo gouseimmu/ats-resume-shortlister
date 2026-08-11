@@ -46,6 +46,15 @@ def inject_styles(sidebar_collapsed=False):
             font-family: 'Inter', sans-serif;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
         .stApp {
             background:
                 radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 28rem),
@@ -575,15 +584,24 @@ def inject_styles(sidebar_collapsed=False):
             box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.04) !important;
         }
 
-        /* Metric row: each Streamlit column stretches equally */
+        [data-testid="stHorizontalBlock"]:has(.metric-card) {
+            display: grid !important;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 16px;
+            align-items: stretch;
+        }
+
         [data-testid="stHorizontalBlock"] > div:has(.metric-card) {
-            flex: 1 1 0 !important;
+            flex: 0 0 auto !important;
             min-width: 0 !important;
+            width: 100% !important;
+            display: flex;
         }
 
         .metric-card {
-            min-height: 112px;
-            padding: 1rem 1.2rem;
+            min-height: 132px;
+            width: 100%;
+            padding: 1rem 1.1rem;
             border-left: 4px solid transparent !important;
             position: relative;
             overflow: hidden;
@@ -630,9 +648,9 @@ def inject_styles(sidebar_collapsed=False):
 
         .metric-value {
             color: var(--ink);
-            font-size: 1.95rem;
+            font-size: 1.8rem;
             font-weight: 800;
-            margin: 0.35rem 0 0.15rem;
+            margin: 0.32rem 0 0.2rem;
             line-height: 1.1;
         }
 
@@ -644,7 +662,7 @@ def inject_styles(sidebar_collapsed=False):
         }
 
         .metric-card .metric-note {
-            margin-top: 0;
+            margin-top: auto;
             color: #94a3b8;
         }
 
@@ -854,25 +872,34 @@ def inject_styles(sidebar_collapsed=False):
             overflow: hidden;
         }
 
-        /* Header band — uses st.columns so it auto-aligns with data rows */
         .results-header-band {
             background: #f8fafc;
             border-bottom: 2px solid #e2e8f0;
-            padding: 0 0.35rem;
+            padding: 0.3rem 0.6rem;
         }
 
-        /* Ensure header band stHorizontalBlock matches row stHorizontalBlock */
         .results-header-band [data-testid="stHorizontalBlock"],
         .results-row [data-testid="stHorizontalBlock"] {
+            display: grid !important;
+            grid-template-columns: 56px minmax(0, 1.85fr) 84px 96px 112px 122px 156px;
+            gap: 0.65rem !important;
             align-items: center !important;
-            gap: 0.5rem !important;
             padding: 0 !important;
+            width: 100% !important;
         }
 
-        /* ATS row wrapper */
+        .results-header-band [data-testid="stHorizontalBlock"] > div,
+        .results-row [data-testid="stHorizontalBlock"] > div {
+            min-width: 0 !important;
+            width: 100% !important;
+            display: flex;
+            align-items: center;
+            min-height: 100%;
+        }
+
         .results-row {
             border-bottom: 1px solid #f1f5f9;
-            padding: 0.5rem 0.35rem 0.35rem;
+            padding: 0.9rem 0.6rem 0.85rem;
             transition: background 0.15s ease;
         }
 
@@ -1011,14 +1038,15 @@ def inject_styles(sidebar_collapsed=False):
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 2rem;
-            height: 2rem;
+            width: 2.2rem;
+            height: 2.2rem;
             border-radius: 10px;
             background: #eef4ff;
             border: 1px solid #c7d7fe;
             color: #1d4ed8;
             font-weight: 800;
             font-size: 0.78rem;
+            flex-shrink: 0;
         }
 
         .skill-label {
@@ -1030,20 +1058,30 @@ def inject_styles(sidebar_collapsed=False):
             text-transform: uppercase;
         }
 
+        .candidate-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            min-width: 0;
+            width: 100%;
+        }
+
         .candidate-name {
             color: var(--ink);
             font-weight: 800;
             line-height: 1.15;
             margin: 0;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
 
         .candidate-email {
             color: var(--muted);
             font-size: 0.76rem;
             margin-top: 0.16rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            line-height: 1.4;
+            overflow-wrap: anywhere;
+            word-break: break-word;
             display: block;
         }
 
@@ -1060,7 +1098,7 @@ def inject_styles(sidebar_collapsed=False):
             letter-spacing: 0.06em;
             text-transform: uppercase;
             white-space: nowrap;
-            padding: 0.75rem 0.6rem;
+            padding: 0.75rem 0.35rem;
         }
 
         .table-cell {
@@ -1070,7 +1108,11 @@ def inject_styles(sidebar_collapsed=False):
             padding: 0.25rem 0;
             display: flex;
             align-items: center;
+            justify-content: flex-start;
             min-height: 100%;
+            min-width: 0;
+            width: 100%;
+            overflow-wrap: anywhere;
         }
 
         .table-cell strong {
@@ -1089,8 +1131,8 @@ def inject_styles(sidebar_collapsed=False):
             font-weight: 700;
             padding: 0.24rem 0.48rem;
             margin: 0.12rem;
-            overflow: visible;
-            text-overflow: unset;
+            overflow-wrap: anywhere;
+            word-break: break-word;
             white-space: normal;
         }
 
@@ -1098,7 +1140,7 @@ def inject_styles(sidebar_collapsed=False):
             display: flex;
             flex-wrap: wrap;
             gap: 0.4rem;
-            margin-top: 0.75rem;
+            margin-top: 0.45rem;
             max-height: none;
             overflow: visible;
         }
@@ -1167,11 +1209,77 @@ def inject_styles(sidebar_collapsed=False):
             margin: 0.1rem 0 0.55rem;
         }
 
+        [data-testid="stHorizontalBlock"]:has(.js-plotly-plot) {
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+            align-items: stretch;
+        }
+
+        [data-testid="stHorizontalBlock"]:has(.js-plotly-plot) > div {
+            min-width: 0 !important;
+            width: 100% !important;
+        }
+
         .js-plotly-plot, div[data-testid="stDataFrame"] {
             border-radius: 12px;
             background: #ffffff;
             border: 1px solid var(--border);
             box-shadow: var(--shadow);
+            overflow: hidden;
+            width: 100%;
+            min-height: 360px;
+        }
+
+        .results-row [data-testid="stHorizontalBlock"] > div:last-child {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: stretch;
+        }
+
+        .results-row [data-testid="stHorizontalBlock"] > div:last-child button,
+        .results-row [data-testid="stHorizontalBlock"] > div:last-child [data-testid="stBaseButton"] {
+            width: 100% !important;
+            min-height: 2.35rem;
+        }
+
+        .action-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .candidate-skill-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+            margin-top: 0.65rem;
+        }
+
+        .skill-panel {
+            padding: 0.8rem 0.9rem;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            min-width: 0;
+        }
+
+        .candidate-summary {
+            margin-top: 0.75rem;
+            padding: 0.8rem 0.95rem;
+            border-radius: 12px;
+            background: rgba(248, 250, 252, 0.95);
+            border: 1px solid #e2e8f0;
+            color: #334155;
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+
+        div[data-testid="stExpander"] {
+            margin-top: 0.75rem;
+            border-radius: 12px !important;
             overflow: hidden;
         }
 
@@ -1186,6 +1294,16 @@ def inject_styles(sidebar_collapsed=False):
             .jd-intel-grid.desktop-3 {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
+            [data-testid="stHorizontalBlock"]:has(.metric-card) {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            [data-testid="stHorizontalBlock"]:has(.js-plotly-plot) {
+                grid-template-columns: 1fr;
+            }
+            .results-header-band [data-testid="stHorizontalBlock"],
+            .results-row [data-testid="stHorizontalBlock"] {
+                grid-template-columns: 48px minmax(0, 1.4fr) 72px 84px 92px 96px 126px;
+            }
         }
 
         @media (max-width: 640px) {
@@ -1195,6 +1313,20 @@ def inject_styles(sidebar_collapsed=False):
             }
             .jd-card {
                 min-height: auto;
+            }
+            [data-testid="stHorizontalBlock"]:has(.metric-card) {
+                grid-template-columns: 1fr;
+            }
+            .results-header-band [data-testid="stHorizontalBlock"],
+            .results-row [data-testid="stHorizontalBlock"] {
+                grid-template-columns: 1fr;
+                gap: 0.4rem;
+            }
+            .results-row [data-testid="stHorizontalBlock"] > div {
+                justify-content: flex-start;
+            }
+            .candidate-skill-grid {
+                grid-template-columns: 1fr;
             }
         }
         </style>
